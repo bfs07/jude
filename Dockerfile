@@ -1,15 +1,19 @@
 FROM debian:jessie
 
-RUN echo "deb http://ftp.de.debian.org/debian jessie-backports main" >> /etc/apt/sources.list
-RUN apt-get update
-RUN apt-get install -y make gcc g++ git wget python python3
+RUN echo "deb [check-valid-until=no] http://archive.debian.org/debian jessie-backports main" >> /etc/apt/sources.list
+
+RUN apt-get update -o Acquire::Check-Valid-Until=false
+RUN apt-get install -y make dialog apt-utils gcc g++ git wget python python3 
+RUN apt-get update -o Acquire::Check-Valid-Until=false
 RUN apt-get install -t jessie-backports -y openjdk-8-jdk-headless ca-certificates-java
+RUN apt-get update -o Acquire::Check-Valid-Until=false
 RUN /usr/sbin/update-java-alternatives -s java-1.8.0-openjdk-amd64
+RUN apt-get update -o Acquire::Check-Valid-Until=false
 
 # install isolate
 WORKDIR /opt
-# ADD https://api.github.com/repos/rsalesc/isolate/compare/master...HEAD /dev/null
-# RUN git clone https://github.com/rsalesc/isolate
+ADD https://api.github.com/repos/rsalesc/isolate/compare/master...HEAD /dev/null
+RUN git clone https://github.com/rsalesc/isolate
 COPY isolate/ isolate/
 
 WORKDIR /opt/isolate
@@ -50,7 +54,5 @@ COPY . .
 
 # start cluster
 EXPOSE 3000
-#CMD pm2 start index.js -i 4 --no-daemon
+# CMD pm2 start index.js -i 4 --no-daemon
 CMD npm run start-index
-
-
