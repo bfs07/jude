@@ -133,3 +133,54 @@ About it: http://askubuntu.com/questions/757384/can-i-use-14-04-mongodb-packages
 
 It seems that now there are better ways to install it on Ubuntu. Anyways it should be safer
 to stick to its Docker image.
+
+# How to bring Jude up in Production
+
+`git clone https://github.com/rsalesc/jude -b latest`
+
+Comment out `- .:/opt/jude` line from `docker-compose.yml`.
+
+Run `./dcomp.sh build && ./dcomp.sh up -d`.
+
+If it is the first time you are running Jude, you should create the root user.
+
+```
+./dcomp.sh run site bash
+node dev/make_db.js
+```
+
+Now a root user was created with credentials `root`/`root`. You should change this password :).
+
+Now hit Ctrl+D to kill the running container.
+
+## How to inspect logs for the containers
+
+`./dcomp.sh logs -f [containers]`
+
+## How to stop containers
+
+`./dcomp.sh stop [containers]`
+
+## How to bring containers back again?
+
+`./dcomp.sh up -d [containers]`
+
+# How to develop in Jude
+
+First you have to install npm packages with `npm i`. Then, you should install Webpack with `sudo npm i -g webpack`.
+
+Make sure the line `- .:/opt/jude` from `docker-compose.yml` is not commented.
+
+To build the packages you should run `npm run build-(index|judge|admin|front)"`. If you rebuild `index` or `judge`, you should stop
+the respective container and bring it up again. For instance, `./dcomp.sh stop site && ./dcomp.sh up -d site`.
+
+## I updated my frontend files, but it didn't work
+
+Have you considered clearing your cache or refreshing the page with `Ctrl+Shift+F5`? (ignores cache).
+
+## Technologies you should understand
+
+- Express (NodeJS)
+- MongoDB
+- Mongoose (ORM on top of MongoDB)
+- marmelab/ng-admin
